@@ -1,9 +1,19 @@
-CC=g++
-CFLAGS = -Wall -g
+p01_chainCC=g++ -std=c++20
+CFLAGS=-O0 -g -Wall
+DEPS = ocurrencies.h
+OBJ = main.o
 
-expresiones: ClienteExpresiones.cc variables.h variables.cc bucles.h bucles.cc comentarios.h comentarios.cc ocurrencies.h ocurrencies.cc cabeceras.h cabeceras.cc define.cc define.h
-	$(CC) $(CFLAGS) -o p04_code_analizer ClienteExpresiones.cc variables.cc bucles.cc comentarios.cc ocurrencies.cc cabeceras.cc define.cc
+SRC = './src/'
 
-clean: 
-	rm -rf p04_code_analizer
-	rm -rf .txt
+compilar:
+	g++ $(CFLAGS) $(SRC)*.cc -o p04_regex
+
+
+%.o: %.cc $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+all: chain
+
+busqueda: main.o
+	g++ -o p04_regex ClienteExpresiones.cc bucles.cc cabeceras.cc comentarios.cc define.cc ocurrencies.cc variables.cc
+clean:
+	rm -f *.o

@@ -28,8 +28,8 @@ class Ocurrencies {
   std::vector<Variable> vector_variables_;
   std::vector<Bucle> vector_bucles_;
   std::vector<Comentario> vector_comentarios_;
-  std::vector<Cabecera> vector_cabeceras_;
-  std::vector<Define> vector_define_;
+  // std::vector<Cabecera> vector_cabeceras_;
+  // std::vector<Define> vector_define_;
   bool has_main_;
 };
 

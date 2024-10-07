@@ -26,8 +26,8 @@ Ocurrencies::Ocurrencies(std::string inputfile) {
   std::vector<Variable> vector_variables;
   std::vector<Bucle> vector_bucles;
   std::vector<Comentario> vector_comentarios;
-  std::vector<Cabecera> vector_cabeceras;
-  std::vector<Define> vector_define;
+  // std::vector<Cabecera> vector_cabeceras;
+  //std::vector<Define> vector_define;
   std::vector<std::string> comentarios;  // almacenar las líneas que formen parte de un comentario de múltiples líneas
   bool comment_start_found = false; // si se está analizando un comentario de múltiples líneas	
   std::string aux; //Variable auxiliar para almacenar las líneas del fichero
@@ -36,12 +36,12 @@ Ocurrencies::Ocurrencies(std::string inputfile) {
   has_main_ = false;
   std::regex expresion_variables 
   ("[^\\(]\\s*(int|double)\\s+(\\w*\\s*[\\(=\\{]?\\s*\\d*\\.?\\d*\\s*[\\)\\}]?)");
-  std::regex expresion_bucles ("\\s*(for|while)\\s*\\(");
+  std::regex expresion_bucles ("\\s*(for|while)\\s*");
   std::regex expresion_comentarios_mono("\\/\\/.*");
   std::regex expresion_comentarios_multistart("\\s*\\/\\*.*\\s*");
   std::regex expresion_comentarios_multiend("\\s*.*\\*\\/\\s*");
-  std::regex expresion_cabeceras("#include\\s*[<\"].*[>\"]");
-  std::regex expresion_define("#define\\s*\\w*");
+  //std::regex expresion_cabeceras("#include\\s*[<\"].*[>\"]");
+  //std::regex expresion_define("#define\\s*\\w*");
   while (getline(input, aux)) {
     std::smatch matches;
     unsigned int iterator{0};
@@ -73,6 +73,8 @@ Ocurrencies::Ocurrencies(std::string inputfile) {
       Variable new_variable(ocurrencie_type,variable_name,line_number);
       vector_variables.push_back(new_variable);
     }
+    // hay que limpiar la variable ocurrencie_type para que no se acumulen valores
+    ocurrencie_type.clear();
     //Búsqueda de bucles
     std::regex_search(aux,matches,expresion_bucles);
     for (auto match: matches) {
@@ -86,6 +88,7 @@ Ocurrencies::Ocurrencies(std::string inputfile) {
     if(std::regex_match(aux,matches,expresion_main)) {
       has_main_ = true;
     }
+    ocurrencie_type.clear();
     //Búsqueda de comentarios de una sola línea
     std::regex_search(aux,matches,expresion_comentarios_mono);
     std::vector<std::string> comentario;
@@ -117,29 +120,29 @@ Ocurrencies::Ocurrencies(std::string inputfile) {
         comment_start_found = false;
       }
     }
-    std::regex_search(aux,matches,expresion_cabeceras);
-    for (auto match: matches) {
-      ocurrencie_type = match;
-    }
-    if (ocurrencie_type.size() > 0) {
-      Cabecera new_cabecera(ocurrencie_type,line_number);
-      vector_cabeceras.push_back(new_cabecera);
-    }
-    std::regex_search(aux,matches,expresion_define);
-    for (auto match: matches) {
-      ocurrencie_type = match;
-    }
-    if (ocurrencie_type.size() > 0) {
-      Define new_define(ocurrencie_type,line_number);
-      vector_define.push_back(new_define);
-    }
+    // std::regex_search(aux,matches,expresion_cabeceras);
+    // for (auto match: matches) {
+    //   ocurrencie_type = match;
+    // }
+    // if (ocurrencie_type.size() > 0) {
+    //   Cabecera new_cabecera(ocurrencie_type,line_number);
+    //   vector_cabeceras.push_back(new_cabecera);
+    // }
+    // std::regex_search(aux,matches,expresion_define);
+    // for (auto match: matches) {
+    //   ocurrencie_type = match;
+    // }
+    // if (ocurrencie_type.size() > 0) {
+    //   Define new_define(ocurrencie_type,line_number);
+    //   vector_define.push_back(new_define);
+    // }
     ++line_number;
   }
   vector_bucles_ = vector_bucles;
   vector_variables_ = vector_variables;
   vector_comentarios_ = vector_comentarios;
-  vector_cabeceras_ = vector_cabeceras;
-  vector_define_ = vector_define;
+  // vector_cabeceras_ = vector_cabeceras;
+  // vector_define_ = vector_define;
 }
 
 void Ocurrencies::WriteOutput(std::string outputfile, std::string inputfile) {
@@ -188,15 +191,5 @@ void Ocurrencies::WriteOutput(std::string outputfile, std::string inputfile) {
         output << vector_comentarios_[i][j] << std::endl;
       }
     }
-  }
-  output << std::endl << "HEADERS: " << std::endl;
-  for (unsigned int i{0}; i < vector_cabeceras_.size(); ++i) {
-    output << "[LINE " << vector_cabeceras_[i].GetLine() << "] "
-    << vector_cabeceras_[i].GetType() << std::endl;
-  }
-  output << std::endl << "DEFINES: " << std::endl;
-  for (unsigned int i{0}; i < vector_define_.size(); ++i) {
-    output << "[LINE " << vector_define_[i].GetLine() << "] "
-    << vector_define_[i].GetName() << std::endl;
   }
 }
